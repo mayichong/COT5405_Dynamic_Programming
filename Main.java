@@ -3,17 +3,17 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        int[][] p = new int[][]{
-//                {0, 1, 2, 2}, {0, 1, 2, 2}, {0, 1, 1, 1}, {0, 1, 1, 1}, {1, 0, 0, 1}
-                {1,2,1},{2,2,2},{1,2,1}
-//                {2,2,2},{2,2,2},{2,2,2}
-//                {0, 0, 1, 1}, {0, 0, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0,0,0,0}
-//                {0,1},{0,1}
+        int[][] p = new int[][] {
+                // {0, 1, 2, 2}, {0, 1, 2, 2}, {0, 1, 1, 1}, {0, 1, 1, 1}, {1, 0, 0, 1}
+                { 1, 2, 1 }, { 2, 2, 2 }, { 1, 2, 1 }
+                // {2,2,2},{2,2,2},{2,2,2}
+                // {0, 0, 1, 1}, {0, 0, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0,0,0,0}
+                // {0,1},{0,1}
         };
         int h = 2;
         alg1BF(p, h);
-//        algBF2(p, h);
-//        alg1DP(p,h);
+        // algBF2(p, h);
+        // alg1DP(p,h);
     }
 
     public static int[] alg1BF(int[][] arr, int h) {
@@ -22,49 +22,49 @@ public class Main {
         int maxSize = 0;
         int[] result = new int[3];
 
-
-        //Brute Force
+        // Brute Force
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                //if the current element is bigger than h
+                // if the current element is bigger than h
                 if (arr[i][j] >= h) {
 
-                    //initialize size equals to 1
+                    // initialize size equals to 1
                     int size = 1;
 
-                    //make boolean true
+                    // make boolean true
                     boolean flag = true;
 
-                    //we check if right and bottom has element or not
+                    // we check if right and bottom has element or not
                     while (i + size < n && j + size < m) {
 
-                        //if we do, we loop through the row first
+                        // if we do, we loop through the row first
                         for (int k = j; k <= j + size; k++) {
 
-                            //if we found the number does not meet minimum trees, we set to false and break
+                            // if we found the number does not meet minimum trees, we set to false and break
                             if (arr[i + size][k] == 0) {
                                 flag = false;
                                 break;
                             }
                         }
 
-                        //then we loop through the column again
+                        // then we loop through the column again
                         for (int k = i; k <= i + size; k++) {
 
-                            //if we found the number does not meet minimum tree, we set to false and break again
+                            // if we found the number does not meet minimum tree, we set to false and break
+                            // again
                             if (arr[k][j + size] == 0) {
                                 flag = false;
                                 break;
                             }
                         }
 
-                        //if the number meet minimum tree, we increase size and loop again
+                        // if the number meet minimum tree, we increase size and loop again
                         if (flag) {
                             size++;
                         }
                     }
 
-                    //After the loop, we compare size with maxSize to get the result
+                    // After the loop, we compare size with maxSize to get the result
                     if (size > maxSize) {
                         maxSize = size;
                         result[0] = i;
@@ -75,12 +75,10 @@ public class Main {
             }
         }
 
-
         System.out.println("start index " + result[0] + " " + result[1]);
         int finish1 = result[0] + result[2] - 1;
         int finish2 = result[1] + result[2] - 1;
         System.out.println("finish index " + finish1 + " " + finish2);
-
 
         return result;
     }
@@ -89,7 +87,7 @@ public class Main {
         int n = arr.length;
         int m = arr[0].length;
         int maxSize = 0;
-        int[] result = new int[3];
+        int[] result = new int[4];
 
         // Iterate over all possible subarrays
         for (int size = 1; size <= Math.min(n, m); size++) {
@@ -112,28 +110,27 @@ public class Main {
                     // Update result if a larger square subarray is found
                     if (isSquare && size > maxSize) {
                         maxSize = size;
-                        result[0] = i;
-                        result[1] = j;
-                        result[2] = size;
+                        result[0] = i + 1;
+                        result[1] = j + 1;
+                        result[2] = size + i;
+                        result[3] = size + j;
                     }
                 }
             }
         }
 
-
         System.out.println(result[0]);
-        System.out.println(result[1]);
-        System.out.println(result[2]);
         return result;
     }
 
-    public static int[] alg1DP(int[][] arr,int h) {
+    public static int[] alg1DP(int[][] arr, int h) {
         int n = arr.length;
         int m = arr[0].length;
         int maxSize = 0;
         int[] result = new int[3];
 
-        // Create a 2D array to store the largest square subarray ending at each position
+        // Create a 2D array to store the largest square subarray ending at each
+        // position
         int[][] dp = new int[n][m];
 
         // Initialize the first row and column of dp
@@ -171,11 +168,11 @@ public class Main {
             }
         }
 
-        if (result[0] == -1){
+        if (result[0] == -1) {
             result[0] = 0;
         }
 
-        if (result[1] == -1){
+        if (result[1] == -1) {
             result[1] = 0;
         }
         System.out.println(result[0]);
@@ -184,6 +181,5 @@ public class Main {
 
         return result;
     }
-
 
 }
