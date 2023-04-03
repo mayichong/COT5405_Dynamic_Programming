@@ -48,140 +48,89 @@ public class DynamicProgramming {
 
     }
 
-    public static void alg1(int m, int n, int h, int[][] arr) {
-        // define max for matrix
-        int max = 0;
+    public static void alg1(int m, int n, int h, int[][] p) {
+        int maxSize = 0;
+        int[] result = new int[4];
 
-        // initialize coordinates
-        int coord1 = 0;
-        int coord2 = 0;
-        int coord3 = 0;
-        int coord4 = 0;
+        // Iterate through the entire 2d array as top left plot
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
 
-        int maxSquare = 0;
-        // Find minimum between n and m
-        if (n > m) {
-            maxSquare = m;
-        } else {
-            maxSquare = n;
+                // Iterate through the entire 2d array as bottom right plot
+                for (int newI = i; newI < m; newI++) {
+                    for (int newJ = j; newJ < n; newJ++) {
+
+                        // if the coordinates form a square
+                        if ((newI - i) == (newJ - j)) {
+
+                            // Check if all elements of subarray has weight >= h
+                            boolean isSquare = true;
+                            for (int x = i; x <= newI; x++) {
+                                for (int y = j; y <= newJ; y++) {
+                                    if (p[x][y] < h) {
+                                        isSquare = false;
+                                    }
+                                }
+
+                            }
+                            // Update result if a larger square subarray is found
+                            if (isSquare && (newI - i + 1) > maxSize) {
+                                maxSize = newI - i + 1;
+                                result[0] = i + 1;
+                                result[1] = j + 1;
+                                result[2] = newI + 1;
+                                result[3] = newJ + 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
+        // Print the coordinates
+        System.out
+                .println(result[0] + " " + result[1] + " " + result[2] + " " + result[3]);
 
-        // initialize size as 1, increase as we go through the loop
-        for (int size = 1; size <= maxSquare; size++) {
+    }
 
-            // make sure that the maximum loop does not exceed the maximum size
-            for (int i = 0; i <= n - size; i++) {
-                for (int j = 0; j <= m - size; j++) {
+    public static void alg2(int m, int n, int h, int[][] p) {
+        int maxSize = 0;
+        int[] result = new int[4];
 
-                    // Check if all elements of subarray meet the requirement
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (p[i][j] >= h) {
+                    int currentSize = 1;
                     boolean isSquare = true;
 
-                    for (int a = i; a < i + size; a++) {
-                        for (int b = j; b < j + size; b++) {
-
-                            // Check if current index is less than h
-                            if (arr[a][b] < h) {
-
-                                // Set spuare to false and break for loop
+                    while (currentSize + i < m && currentSize + j < n && isSquare) {
+                        for (int k = j; k <= currentSize + j; k++) {
+                            if (p[i + currentSize][k] < h) {
                                 isSquare = false;
                                 break;
                             }
                         }
-
-                        // After for loop is done, break if isSquare is false
-                        if (!isSquare) {
-                            break;
-                        }
-                    }
-
-                    // Update result if a larger square subarray is found
-                    if (isSquare == true) {
-                        if (size > max) {
-                            // set size of new max
-                            max = size;
-
-                            // coordnate1,2,3,4 as top left coord and bottom right coord
-                            coord1 = i;
-                            coord2 = j;
-                            coord3 = i + size;
-                            coord4 = j + size;
-                        }
-                    }
-                }
-            }
-        }
-
-        System.out.println(coord1 + " " + coord2 + " " + coord3 + " " +
-                coord4);
-    }
-
-    public static void alg2(int m, int n, int h, int[][] original) {
-        // define max to be 0
-        int max = 0;
-        int coord1 = 0;
-        int coord2 = 0;
-        int coord3 = 0;
-        int coord4 = 0;
-        // Iterate original matrix
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-
-                // If the current element is greater than or equal to h
-                if (original[j][i] >= h) {
-
-                    // Initialize size, right and top
-                    int size = 1;
-                    int left = size + j;
-                    int top = size + i;
-
-                    // We check if right and bottom have element or not
-                    while (n >= size + left && m >= size + top) {
-                        // Initialize a boolean statement to true
-                        boolean isSquare = true;
-
-                        // loop through elements in the matrix added size
-                        for (int a = j; a < j + size; a++) {
-                            for (int b = i; b < i + size; b++) {
-
-                                // check if index element is smaller than h
-                                if (original[a][b] < h) {
-
-                                    // make isSquare false since one of the element is smaller than h in the matrix
-                                    isSquare = false;
-                                    break;
-                                }
-                            }
-
-                            // terminate for loop early if isSquare is always false
-                            if (isSquare == false) {
+                        for (int k = i; k <= currentSize + i; k++) {
+                            if (p[k][j + currentSize] < h) {
+                                isSquare = false;
                                 break;
                             }
                         }
-
-                        // set max to the current size and record the latest info
-                        if (isSquare == true) {
-                            if (size > max) {
-                                // set size of new max
-                                max = size;
-
-                                // coordnate1,2,3,4 as top left coord and bottom right coord
-                                coord1 = i;
-                                coord2 = j;
-                                coord3 = i + size;
-                                coord4 = j + size;
-                            }
+                        if (isSquare) {
+                            currentSize++;
                         }
-                        // If all indexes are greater than h, we increase size and loop again to find
-                        // the maximum
-                        size++;
                     }
-
+                    if (maxSize < currentSize) {
+                        maxSize = currentSize;
+                        result[0] = i + 1;
+                        result[1] = j + 1;
+                        result[2] = i + currentSize;
+                        result[3] = j + currentSize;
+                    }
                 }
             }
         }
 
-        System.out.println(coord1 + " " + coord2 + " " + coord3 + " " +
-                coord4);
+        System.out.println(result[0] + " " + result[1] + " " + result[2] + " " + result[3]);
     }
 
     public static void alg3(int m, int n, int h, int[][] p) {
