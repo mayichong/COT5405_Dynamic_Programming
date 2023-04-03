@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 import java.lang.Math;
 
@@ -6,7 +7,7 @@ public class DynamicProgramming {
 
         // String argument = args[0];
 
-        int tempInt = 1;
+        int tempInt = 2;
 
         switch (tempInt) {
             case 1, 2, 3, 4, 5: {
@@ -22,7 +23,7 @@ public class DynamicProgramming {
                     }
                 }
                 s.close();
-                alg2(m, n, h, p);
+                alg5a(m, n, h, p);
                 break;
             }
 
@@ -64,17 +65,17 @@ public class DynamicProgramming {
                         if ((newI - i) == (newJ - j)) {
 
                             // Check if all elements of subarray has weight >= h
-                            boolean isSquare = true;
+                            boolean isValid = true;
                             for (int x = i; x <= newI; x++) {
                                 for (int y = j; y <= newJ; y++) {
                                     if (p[x][y] < h) {
-                                        isSquare = false;
+                                        isValid = false;
                                     }
                                 }
 
                             }
                             // Update result if a larger square subarray is found
-                            if (isSquare && (newI - i + 1) > maxSize) {
+                            if (isValid && (newI - i + 1) > maxSize) {
                                 maxSize = newI - i + 1;
                                 result[0] = i + 1;
                                 result[1] = j + 1;
@@ -96,29 +97,41 @@ public class DynamicProgramming {
         int maxSize = 0;
         int[] result = new int[4];
 
+        // Iterate through the entire 2d array as the top-most slot
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
+                // Check if the current slot has a weight >= h
                 if (p[i][j] >= h) {
-                    int currentSize = 1;
-                    boolean isSquare = true;
 
-                    while (currentSize + i < m && currentSize + j < n && isSquare) {
-                        for (int k = j; k <= currentSize + j; k++) {
-                            if (p[i + currentSize][k] < h) {
-                                isSquare = false;
-                                break;
-                            }
-                        }
+                    int currentSize = 1;
+                    boolean isValid = true;
+
+                    // expand valid square until the square is no longer valid
+                    while (currentSize + i < m && currentSize + j < n && isValid) {
+
+                        // check if the square could expand vertically
                         for (int k = i; k <= currentSize + i; k++) {
                             if (p[k][j + currentSize] < h) {
-                                isSquare = false;
+                                isValid = false;
                                 break;
                             }
                         }
-                        if (isSquare) {
+
+                        // check if the square could expand horizontally
+                        for (int k = j; k <= currentSize + j; k++) {
+                            if (p[i + currentSize][k] < h) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+
+                        // if it is a valid square, increase the size of square
+                        if (isValid) {
                             currentSize++;
                         }
                     }
+
+                    // if currentSize is bigger than maxSize, store the new maxSize
                     if (maxSize < currentSize) {
                         maxSize = currentSize;
                         result[0] = i + 1;
@@ -135,9 +148,9 @@ public class DynamicProgramming {
 
     public static void alg3(int m, int n, int h, int[][] p) {
         int maxSize = 0;
-        int dp[][] = new int[m][n];
         int maxRow = 0;
         int maxCol = 0;
+        int dp[][] = new int[m][n];
 
         // Interate through the entire 2D array
         for (int i = 0; i < m; i++) {
@@ -172,16 +185,23 @@ public class DynamicProgramming {
 
     }
 
-    public static void alg5(int m, int n, int h, int[][] p) {
+    public static void alg5a(int m, int n, int h, int[][] p) {
         int maxSize = 0;
-        int dp[][] = new int[m][n];
         int maxRow = 0;
         int maxCol = 0;
+        int dp[][] = new int[m][n];
 
+        // Interate through the entire 2D array as the bottom-right plot
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
+
+                // If the current element is greater than or equal to h
                 if (p[i][j] >= h) {
+                    // if current element is not located at the leftmost or topmost layer
                     if (i >= 1 && j >= 1) {
+
+                        // check the 2x2 square where dp[i][j] is the bottom right plot and ignore the
+                        // weight of p[i-1][j-1]
                         if (p[i - 1][j - 1] < h) {
                             dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + 1;
                         } else {
@@ -191,18 +211,82 @@ public class DynamicProgramming {
                     } else {
                         dp[i][j] = 1;
                     }
+                    // if dp[i][j] is greater than maxSize
                     if (dp[i][j] > maxSize) {
                         maxRow = i;
                         maxCol = j;
                         maxSize = dp[i][j];
                     }
+                    // when the corner p[i][j] is < h
+                } else {
+                    dp[i][j] = 1;
+                }
+            }
+
+        }
+        System.out.println(
+                (maxRow - maxSize + 2) + " " + (maxCol - maxSize + 2) + " " + (maxRow + 1) + " " + (maxCol + 1));
+
+    }
+
+    public static void alg5b(int m, int n, int h, int[][] p) {
+        int maxSize = 0;
+        int maxRow = 0;
+        int maxCol = 0;
+        int dp[][] = new int[m][n];
+
+        // initialize the dp array
+        for (int i = 0; i < m; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+
+        // Interate through the entire 2D array
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int currentSize = alg5bRecursion(i, j, m, n, h, p, dp);
+
+                // if the current square is greater than maxSize
+                if (currentSize > maxSize) {
+                    maxSize = currentSize;
+                    maxRow = i;
+                    maxCol = j;
                 }
             }
         }
+
         System.out.println(
                 (maxRow - maxSize + 2) + " " + (maxCol - maxSize + 2) + " " + (maxRow + 1) +
                         " " + (maxCol + 1));
 
+    }
+
+    public static int alg5bRecursion(int i, int j, int m, int n, int h, int[][] p, int[][] dp) {
+        // Base case
+
+        // out of bound check
+        if (i < 0 || m <= i || j < 0 || n <= j) {
+            return 0;
+        }
+
+        // < h check
+        if (p[i][j] < h) {
+            return 0;
+        }
+        // if the current plot is visited, return its value
+        if (dp[i][j] != -1) {
+            return dp[i][j];
+        }
+
+        // Recursive calculations
+        int left = alg5bRecursion(i, j - 1, m, n, h, p, dp);
+        int top = alg5bRecursion(i - 1, j, m, n, h, p, dp);
+        int topLeft = alg5bRecursion(i - 1, j - 1, m, n, h, p, dp);
+
+        // current slot is the minimal value of the 3 adjacent slot + 1
+        int temp = Math.min(top, topLeft);
+        dp[i][j] = Math.min(temp, left) + 1;
+
+        return dp[i][j];
     }
 
     public static void alg6(int m, int n, int h, int k, int[][] p) {
@@ -249,60 +333,63 @@ public class DynamicProgramming {
     }
 
     public static void alg7(int m, int n, int h, int k, int[][] p) {
+        int maxSize = 0;
+        int[] result = new int[4];
 
-        int[][] prefixSum = new int[m][n];
+        // construct the prefix sum matrix
+        int[][] prefixP = new int[m][n];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                // Create the binary matrix and calculate the prefix sum simultaneously
-                prefixSum[i][j] = p[i][j] >= h ? 1 : 0;
+                // convert p[i][j] into binary representation of >= or < h
+                if (p[i][j] >= h) {
+                    prefixP[i][j] = 1;
+                } else {
+                    prefixP[i][j] = 0;
+                }
+                // prefix[i][j] should include the sum of current plot's row/column adjacent
+                // plots
+                if (i > 0 && j > 0) {
+                    prefixP[i][j] -= prefixP[i - 1][j - 1];
+                }
                 if (i > 0) {
-                    prefixSum[i][j] += prefixSum[i - 1][j];
+                    prefixP[i][j] += prefixP[i - 1][j];
                 }
                 if (j > 0) {
-                    prefixSum[i][j] += prefixSum[i][j - 1];
-                }
-                if (i > 0 && j > 0) {
-                    prefixSum[i][j] -= prefixSum[i - 1][j - 1];
+                    prefixP[i][j] += prefixP[i][j - 1];
                 }
             }
         }
 
-        // Step 3: Initialize variables to keep track of the maximum square size and
-        // coordinates
-        int maxSquareSize = 0;
-        int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+        // Iterate through all possibe square sizes
+        for (int currentSize = 1; currentSize <= Math.min(m, n); currentSize++) {
 
-        // Step 4: Iterate over all possible square sizes and squares
-        for (int size = 1; size <= Math.min(m, n); size++) {
-            for (int i = 0; i <= m - size; i++) {
-                for (int j = 0; j <= n - size; j++) {
-                    int total = prefixSum[i + size - 1][j + size - 1];
+            // Iterate all possible coordiantes within the size limitation
+            for (int i = 0; i <= m - currentSize; i++) {
+                for (int j = 0; j <= n - currentSize; j++) {
+
+                    // calculate the number of plots that >= h
+                    int sum = prefixP[i + currentSize - 1][j + currentSize - 1];
+                    if (i > 0 && j > 0) {
+                        sum += prefixP[i - 1][j - 1];
+                    }
                     if (i > 0) {
-                        total -= prefixSum[i - 1][j + size - 1];
+                        sum -= prefixP[i - 1][j + currentSize - 1];
                     }
                     if (j > 0) {
-                        total -= prefixSum[i + size - 1][j - 1];
+                        sum -= prefixP[i + currentSize - 1][j - 1];
                     }
-                    if (i > 0 && j > 0) {
-                        total += prefixSum[i - 1][j - 1];
-                    }
+                    // is conditions are satisfied, update new maxSize and coordinates
+                    if (currentSize > maxSize && (currentSize * currentSize - sum) <= k) {
+                        maxSize = currentSize;
+                        result[0] = i + 1;
+                        result[1] = j + 1;
+                        result[2] = i + currentSize;
+                        result[3] = j + currentSize;
 
-                    // Check if the number of plots that do not satisfy the tree condition is <= k
-                    if ((size * size - total) <= k) {
-                        if (size > maxSquareSize) {
-                            maxSquareSize = size;
-                            x1 = i;
-                            y1 = j;
-                            x2 = i + size - 1;
-                            y2 = j + size - 1;
-                        }
                     }
                 }
             }
         }
-
-        // Step 5: Output the bounding indices of the optimal solution region
-        System.out.println((x1 + 1) + " " + (y1 + 1) + " " + (x2 + 1) + " " + (y2 + 1));
+        System.out.println(result[0] + " " + result[1] + " " + result[2] + " " + result[3]);
     }
-
 }
