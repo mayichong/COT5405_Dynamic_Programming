@@ -1,3 +1,6 @@
+import java.util.Scanner;
+import java.lang.Math;
+
 public class DynamicProgramming {
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
