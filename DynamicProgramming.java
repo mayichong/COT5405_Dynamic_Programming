@@ -233,7 +233,7 @@ public class DynamicProgramming {
                             break;
                         }
 
-                        // if dp[i][j] is greater than maxSize
+                        // if currentSize is greater than maxSize
                         if (j - k + 1 > maxSize) {
                             maxSize = j - k + 1;
                             maxRow = i;
@@ -244,8 +244,8 @@ public class DynamicProgramming {
             }
         }
         System.out.println(
-                (maxRow - maxSize + 3) + " " + (maxCol - maxSize + 4) + " " + (maxRow + 2) + " " + (maxCol + 3));
-
+                (maxRow - maxSize + 3) + " " + (maxCol - maxSize + 4) + " " + (maxRow + 2) +
+                        " " + (maxCol + 3));
     }
 
     public static void alg5a(int m, int n, int h, int[][] p) {
