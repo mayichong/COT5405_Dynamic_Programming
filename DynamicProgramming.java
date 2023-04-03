@@ -5,12 +5,10 @@ import java.lang.Math;
 public class DynamicProgramming {
     public static void main(String[] args) {
 
-        // String argument = args[0];
+        String argument = args[0];
 
-        int tempInt = 2;
-
-        switch (tempInt) {
-            case 1, 2, 3, 4, 5: {
+        switch (argument) {
+            case "1", "2", "3", "4", "5": {
                 Scanner s = new Scanner(System.in);
                 int m = s.nextInt();
                 int n = s.nextInt();
@@ -23,11 +21,35 @@ public class DynamicProgramming {
                     }
                 }
                 s.close();
-                alg5a(m, n, h, p);
+
+                switch (argument) {
+                    case "1": {
+                        alg1(m, n, h, p);
+                        break;
+                    }
+                    case "2": {
+                        alg2(m, n, h, p);
+                        break;
+                    }
+                    case "3": {
+                        alg3(m, n, h, p);
+                        break;
+                    }
+                    case "4": {
+                        alg4(m, n, h, p);
+                        break;
+                    }
+                    case "5": {
+                        alg5a(m, n, h, p);
+                        alg5b(m, n, h, p);
+                        break;
+                    }
+                }
+
                 break;
             }
 
-            case 6, 7: {
+            case "6", "7": {
                 Scanner s = new Scanner(System.in);
                 int m = s.nextInt();
                 int n = s.nextInt();
@@ -42,7 +64,16 @@ public class DynamicProgramming {
                 }
                 s.close();
 
-                alg7(m, n, h, k, p);
+                switch (argument) {
+                    case "6": {
+                        alg6(m, n, h, k, p);
+                        break;
+                    }
+                    case "7": {
+                        alg7b(m, n, h, k, p);
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -182,6 +213,38 @@ public class DynamicProgramming {
     }
 
     public static void alg4(int m, int n, int h, int[][] p) {
+        int maxSize = 0;
+        int maxRow = 0;
+        int maxCol = 0;
+
+        // Interate through the entire 2D array
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // If the current element is greater than or equal to h
+                if (p[i][j] >= h) {
+                    // initialize currentMin to current slot value
+                    int currentMin = p[i][j];
+                    // Iterate through columns from right to left
+                    for (int k = j; k >= 0; k--) {
+                        // find the min between current slot vs left neighbor
+                        currentMin = Math.min(currentMin, p[i][k]);
+                        if (currentMin < h) {
+                            break;
+                        }
+
+                        // if dp[i][j] is greater than maxSize
+                        if (j - k + 1 > maxSize) {
+                            maxSize = j - k + 1;
+                            maxRow = i;
+                            maxCol = k;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println(
+                (maxRow - maxSize + 3) + " " + (maxCol - maxSize + 4) + " " + (maxRow + 2) + " " + (maxCol + 3));
 
     }
 
@@ -225,7 +288,7 @@ public class DynamicProgramming {
 
         }
         System.out.println(
-                (maxRow - maxSize + 2) + " " + (maxCol - maxSize + 2) + " " + (maxRow + 1) + " " + (maxCol + 1));
+                (maxRow - maxSize + 3) + " " + (maxCol - maxSize + 3) + " " + (maxRow + 2) + " " + (maxCol + 2));
 
     }
 
@@ -255,8 +318,8 @@ public class DynamicProgramming {
         }
 
         System.out.println(
-                (maxRow - maxSize + 2) + " " + (maxCol - maxSize + 2) + " " + (maxRow + 1) +
-                        " " + (maxCol + 1));
+                (maxRow - maxSize + 3) + " " + (maxCol - maxSize + 3) + " " + (maxRow + 2) +
+                        " " + (maxCol + 2));
 
     }
 
@@ -332,7 +395,7 @@ public class DynamicProgramming {
 
     }
 
-    public static void alg7(int m, int n, int h, int k, int[][] p) {
+    public static void alg7b(int m, int n, int h, int k, int[][] p) {
         int maxSize = 0;
         int[] result = new int[4];
 
